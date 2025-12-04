@@ -1,0 +1,20 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: DEV-BOOK-AI
+  ai:
+    vectorstore:
+      redis:
+        # Redis vector store related properties...
+    openai:
+      temperature: 0.3
+      api-key: sk-proj-Y4inDTA20h7YrGeH8WhuT3BlbkFJibZlp0sqTAcywSqqvwY2
+      model: gpt-3.5-turbo
+      #embedding-base-url: https://api.openai.com
+      #embedding-api-key: ${SPRING_AI_OPENAI_API_KEY}
+      #embedding-model: text-embedding-ada-002  
+            
+logging:
+  level:
+    org.springframework: DEBUG
