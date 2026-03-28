@@ -9,7 +9,6 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.openai.api.OpenAiApi.FunctionTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +23,12 @@ public class OpenAiChatController {
 	private final OpenAiChatClient chatClient;
 
 	@Autowired
-    public OpenAiRestController(OpenAiChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+	public OpenAiChatController(OpenAiChatClient chatClient) {
+		this.chatClient = chatClient;
+	}
 
 	@GetMapping("/ai/generate")
-	public Map generate(@RequestParam(value = "message") String message) {
+	public Map<String, String> generate(@RequestParam(value = "message") String message) {
 		return Map.of("generation", chatClient.call(message));
 	}
 
@@ -50,11 +49,11 @@ public class OpenAiChatController {
 	public Generation toolCalling(@RequestParam(value = "message") String message) {
 		new UserMessage(message);
 
-		List<FunctionTool> toolsList = List.of(rectangleAreaTool);
+		List<FunctionTool> toolsList = List.of();
 		Prompt prompt = new Prompt(message, OpenAiChatOptions.builder().withTools(toolsList).build());
 
 		ChatResponse response = chatClient.call(prompt);
 		return response.getResult();
 	}
 
-}}
+}
