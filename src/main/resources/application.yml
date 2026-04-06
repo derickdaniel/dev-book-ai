@@ -1,20 +1,42 @@
 server:
-  port: 8083
+  port: 8085
 spring:
-  application:
-    name: DEV-BOOK-AI
-  ai:
-    vectorstore:
-      redis:
+    datasource:
+      url: jdbc:mysql://${DB_HOST:localhost}:3306/dev_book_ai_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: root
+      driverClassName: com.mysql.cj.jdbc.Driver
+    jpa:
+      hibernate:
+        ddl-auto: update
+    application:
+      name: DEV-BOOK-AI
+    ai:
+      vectorstore:
+        redis:
         # Redis vector store related properties...
-    openai:
-      temperature: 0.3
-      api-key: sk-proj-Y4inDTA20h7YrGeH8WhuT3BlbkFJibZlp0sqTAcywSqqvwY2
-      model: gpt-3.5-turbo
-      #embedding-base-url: https://api.openai.com
-      #embedding-api-key: ${SPRING_AI_OPENAI_API_KEY}
-      #embedding-model: text-embedding-ada-002  
+      openai:
+        temperature: 0.3
+        api-key: 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
+        model: gpt-3.5-turbo
+        embedding-base-url: https://api.openai.com
+        embedding-api-key: ${SPRING_AI_OPENAI_API_KEY}
+        embedding-model: text-embedding-ada-002
+        
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}  
             
 logging:
   level:
     org.springframework: DEBUG
+    
+    
+gemini:
+  ai:
+    api-key: AIzaSyBbabBQiRh-2k3tsv4jQdU8s48G78OJA2Y
