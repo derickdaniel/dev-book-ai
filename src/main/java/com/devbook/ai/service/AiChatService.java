@@ -1,7 +1,8 @@
 package com.devbook.ai.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.devbook.ai.dto.AIChatResponseDTO;
@@ -15,13 +16,19 @@ import com.devbook.ai.repository.ConversationRepository;
 import com.devbook.ai.repository.MessageRepository;
 import com.devbook.ai.repository.UsageLogRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class AiChatService {
 
 	private final ConversationRepository conversationRepo;
 	private final MessageRepository messageRepo;
 	private final AiResponseRepository aiResponseRepo;
 	private final UsageLogRepository usageLogRepo;
+
+	@Autowired
+	MessageService messageService;
 
 	@Autowired
 	public AiChatService(ConversationRepository conversationRepo, MessageRepository messageRepo,
@@ -43,9 +50,12 @@ public class AiChatService {
 		} else {
 			conversation = new Conversation();
 			conversation.setUserId(userId);
-			conversation.setTitle("New Chat");
+			conversation.setTitle(generateTitle(userInput));
+			conversation.setCreatedAt(LocalDateTime.now());
 			conversation = conversationRepo.save(conversation);
 		}
+		
+		updateMissingFields(conversation);
 
 		// Save USER message
 		Message userMessage = new Message();
@@ -90,6 +100,32 @@ public class AiChatService {
 				"AI chat saved.  Message Id: " + aiMessage.getId() + " Conversation Id: " + conversation.getId());
 
 		return new AIChatResponseDTO(userId, conversation.getId(), userInput, aiReply);
+	}
+
+	private void updateMissingFields(Conversation conversation) {
+		if(conversation.getTitle().contains("Conversation")) {
+			conversation.setTitle(generateTitle((messageService.getByConversationId(conversation.getId()).get(0).getContent())));
+		}
+		
+		if (conversation.getCreatedAt() == null) {
+			conversation.setCreatedAt(LocalDateTime.now());
+		}
+	}
+	
+	public void deleteConversation(Long conversationId) {
+
+        // 1. delete AI responses (if exists)
+		aiResponseRepo.deleteByConversationId(conversationId);
+
+        // 2. delete messages
+        messageRepo.deleteByConversationId(conversationId);
+
+        // 3. delete conversation
+        conversationRepo.deleteById(conversationId);
+    }
+
+	private String generateTitle(String prompt) {
+		return prompt.length() > 40 ? prompt.substring(0, 40) + "..." : prompt;
 	}
 
 }

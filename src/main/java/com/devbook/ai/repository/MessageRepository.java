@@ -9,4 +9,6 @@ import com.devbook.ai.entity.Message;
 public interface MessageRepository extends JpaRepository<Message, Long> {
 	
 	List<Message> findByConversationId(Long conversationId);
+	
+	void deleteByConversationId(Long conversationId);
 }
