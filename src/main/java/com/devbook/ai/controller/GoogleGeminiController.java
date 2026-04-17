@@ -1,6 +1,10 @@
 package com.devbook.ai.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.devbook.ai.dto.AIChatRequestDTO;
 import com.devbook.ai.dto.AIChatResponseDTO;
+import com.devbook.ai.dto.GeminiModelResponse;
 import com.devbook.ai.service.GoogleGeminiService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,8 +31,14 @@ public class GoogleGeminiController {
 	public AIChatResponseDTO generateContent(@RequestBody AIChatRequestDTO genContentDTO) {
 
 		genContentDTO.setUserId(Long.valueOf(httpServletRequest.getHeader("userid")));
-		
+
 		return geminiService.generateContent(genContentDTO);
 	}
 
+	@GetMapping
+	@RequestMapping("/gemini/models")
+	public List<GeminiModelResponse> getModels() {
+
+		return geminiService.getModelList();
+	}
 }
